@@ -3,12 +3,16 @@
   "version": "1.0.0",
   "description": "A youtube like platform",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/index.js"
   },
   "keywords": [
     "youtube"
   ],
   "author": "Syed Muazzam Abbas",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
 }
