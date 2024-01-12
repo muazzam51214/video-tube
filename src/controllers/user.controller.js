@@ -6,13 +6,12 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 const registerUser = async (req, res, next) => {
   try {
     const {username,email,fullName,password} = req.body;
-    console.log("Email :", email);
 
     if ([username,email,fullName,password].some((field) => field?.trim() === "")) {
       throw new ApiError(400, "All field are required!")
     }
 
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
       $or : [{username}, {email}]
     })
 
@@ -21,7 +20,12 @@ const registerUser = async (req, res, next) => {
     }
 
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+      coverImageLocalPath = req.files?.coverImage[0]?.path;
+    }
+
 
     if(!avatarLocalPath){
       throw new ApiError(400, "Avatar image is required");
