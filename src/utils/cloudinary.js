@@ -21,4 +21,21 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 }
 
-export {uploadOnCloudinary};
+const deleteFromCloudinary = async (oldAvatarURL) => {
+  try {
+    if (!oldAvatarURL) return null;
+
+    // Get the public ID from the URL (assuming it's a Cloudinary URL)
+    const publicId = cloudinary.url(oldAvatarURL).public_id;
+    
+
+    // Delete the resource using the public ID
+    const deletionResult = await cloudinary.uploader.destroy(publicId);
+    return deletionResult;
+  } catch (error) {
+    console.log("Error while deleting from Cloudinary: ", error);
+    return null;
+  }
+}
+
+export {uploadOnCloudinary, deleteFromCloudinary};
