@@ -114,6 +114,13 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
+  const video = await Video.findById(videoId);
+  video.isPublished = !video.isPublished;
+  await video.save();
+
+  return res
+  .status(200)
+  .json(new ApiResponse(200, {}, "Status Toggled Successfully"))
 });
 
 export {
