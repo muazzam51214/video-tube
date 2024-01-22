@@ -259,10 +259,12 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   // Deleting Old Avatar
   const oldUser = await User.findById(req.user?._id);
   const oldAvatarURL = oldUser.avatar;
+  const apid = extractPublicId(oldAvatarURL)
+
   if (!oldAvatarURL) {
     new ApiError(400, "Old Avatar not found");
   }
-  const oldAvatar = await deleteFromCloudinary(oldAvatarURL);
+  const oldAvatar = await deleteFromCloudinary(apid);
   if (!oldAvatar) {
     new ApiError(400, "Error while deleting from cloudinary");
   }

@@ -1,17 +1,17 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_API_SECRET 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 const uploadOnCloudinary = async (localFilePath) => {
   try {
-    if(!localFilePath) return null;
+    if (!localFilePath) return null;
     // upload file on cloudinary
     const response = await cloudinary.uploader.upload(localFilePath, {
-      resource_type:"auto"
-    })
+      resource_type: "auto",
+    });
     fs.unlinkSync(localFilePath);
     return response;
   } catch (error) {
@@ -19,23 +19,34 @@ const uploadOnCloudinary = async (localFilePath) => {
 
     return null;
   }
-}
+};
 
-const deleteFromCloudinary = async (oldAvatarURL) => {
+const deleteFromCloudinary = async (publicId) => {
   try {
-    if (!oldAvatarURL) return null;
-
-    // Get the public ID from the URL (assuming it's a Cloudinary URL)
-    const publicId = cloudinary.url(oldAvatarURL).public_id;
-    
-
+    if (!publicId) return null;
     // Delete the resource using the public ID
-    const deletionResult = await cloudinary.uploader.destroy(publicId);
+    const deletionResult = await cloudinary.uploader.destroy(publicId, {
+      resource_type: "image",
+    });
     return deletionResult;
   } catch (error) {
     console.log("Error while deleting from Cloudinary: ", error);
     return null;
   }
-}
+};
 
-export {uploadOnCloudinary, deleteFromCloudinary};
+const deleteVideoFromCloudinary = async (publicId) => {
+  try {
+    if (!publicId) return null;
+    // Delete the resource using the public ID
+    const deletionResult = await cloudinary.uploader.destroy(publicId, {
+      resource_type: "video",
+    });
+    return deletionResult;
+  } catch (error) {
+    console.log("Error while deleting from Cloudinary: ", error);
+    return null;
+  }
+};
+
+export { uploadOnCloudinary, deleteFromCloudinary,deleteVideoFromCloudinary };
