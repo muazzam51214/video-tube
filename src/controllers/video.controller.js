@@ -1,6 +1,5 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { Video } from "../models/video.model.js";
-import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -14,6 +13,35 @@ import { extractPublicId } from "cloudinary-build-url";
 const getAllVideos = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
   //TODO: get all videos based on query, sort, pagination
+
+  
+    // Define the base query
+    let videoQuery = {};
+
+    // Apply filters based on the request parameters
+    if (query) {
+      videoQuery = { ...videoQuery, title: new RegExp(query, 'i') };
+    }
+    if (userId) {
+      videoQuery = { ...videoQuery, owner: userId };
+    }
+    
+    // Get the total count of videos matching the query
+    const totalVideos = await Video.countDocuments(videoQuery);
+     // Apply sorting based on sortBy and sortType
+     let sortCriteria = {};
+     if (sortBy) {
+       sortCriteria[sortBy] = sortType === 'desc' ? -1 : 1;
+     }
+ 
+     // Retrieve videos based on pagination, query, and sort
+     const videos = await Video.find(videoQuery)
+       .sort(sortCriteria)
+       .skip((page - 1) * limit)
+       .limit(Number(limit));
+ 
+     return res.status(200).json(new ApiResponse(200, videos, 'Videos Fetched Successfully'));
+
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
