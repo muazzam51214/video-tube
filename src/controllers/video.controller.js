@@ -14,34 +14,38 @@ const getAllVideos = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
   //TODO: get all videos based on query, sort, pagination
 
-  
-    // Define the base query
-    let videoQuery = {};
+  // Define the base query
+  let videoQuery = {};
 
-    // Apply filters based on the request parameters
-    if (query) {
-      videoQuery = { ...videoQuery, title: new RegExp(query, 'i') };
-    }
-    if (userId) {
-      videoQuery = { ...videoQuery, owner: userId };
-    }
-    
-    // Get the total count of videos matching the query
-    const totalVideos = await Video.countDocuments(videoQuery);
-     // Apply sorting based on sortBy and sortType
-     let sortCriteria = {};
-     if (sortBy) {
-       sortCriteria[sortBy] = sortType === 'desc' ? -1 : 1;
-     }
- 
-     // Retrieve videos based on pagination, query, and sort
-     const videos = await Video.find(videoQuery)
-       .sort(sortCriteria)
-       .skip((page - 1) * limit)
-       .limit(Number(limit));
- 
-     return res.status(200).json(new ApiResponse(200, videos, 'Videos Fetched Successfully'));
+  // Apply filters based on the request parameters
+  if (query) {
+    videoQuery = { ...videoQuery, title: new RegExp(query, "i") };
+  }
 
+  if (userId) {
+    if (!isValidObjectId(userId)) {
+      throw new ApiError(400, "Invalid userId format");
+    }
+    videoQuery = { ...videoQuery, owner: userId };
+  }
+
+  // Get the total count of videos matching the query
+  const totalVideos = await Video.countDocuments(videoQuery);
+  // Apply sorting based on sortBy and sortType
+  let sortCriteria = {};
+  if (sortBy) {
+    sortCriteria[sortBy] = sortType === "desc" ? -1 : 1;
+  }
+
+  // Retrieve videos based on pagination, query, and sort
+  const videos = await Video.find(videoQuery)
+    .sort(sortCriteria)
+    .skip((page - 1) * limit)
+    .limit(Number(limit));
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, videos, "Videos Fetched Successfully"));
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
@@ -99,8 +103,12 @@ const publishAVideo = asyncHandler(async (req, res) => {
 const getVideoById = asyncHandler(async (req, res) => {
   //TODO: get video by id
   const { videoId } = req.params;
+  
   if (!videoId?.trim()) {
     throw new ApiError(400, "videoId is missing");
+  }
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(400, "Invalid videoId format");
   }
   const video = await Video.findById(videoId);
 
@@ -118,6 +126,11 @@ const updateVideo = asyncHandler(async (req, res) => {
   if (!videoId?.trim()) {
     throw new ApiError(400, "videoId is missing");
   }
+
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(400, "Invalid videoId format");
+  }
+
   const { title, description } = req.body;
   if (!title || !description) {
     throw new ApiError(400, "All Fields are required");
@@ -145,8 +158,6 @@ const updateVideo = asyncHandler(async (req, res) => {
     new ApiError(400, "Error while deleting from cloudinary");
   }
 
-  
-  
   const video = await Video.findByIdAndUpdate(
     videoId,
     {
@@ -159,7 +170,6 @@ const updateVideo = asyncHandler(async (req, res) => {
     { new: true }
   );
 
-
   return res
     .status(200)
     .json(new ApiResponse(200, video, "Video Updated Successfully"));
@@ -170,7 +180,10 @@ const deleteVideo = asyncHandler(async (req, res) => {
   if (!videoId?.trim()) {
     throw new ApiError(400, "videoId is missing");
   }
-  const video = await   Video.findByIdAndDelete(videoId);
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(400, "Invalid videoId format");
+  }
+  const video = await Video.findByIdAndDelete(videoId);
 
   if (!video) {
     throw new ApiError(500, "Video File Not Found");
@@ -203,6 +216,9 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   if (!videoId?.trim()) {
     throw new ApiError(400, "videoId is missing");
+  }
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(400, "Invalid videoId format");
   }
   const video = await Video.findById(videoId);
   video.isPublished = !video.isPublished;
