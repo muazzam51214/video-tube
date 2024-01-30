@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import { Comment } from "../models/comment.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -10,6 +10,9 @@ const getVideoComments = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
   if (!videoId?.trim()) {
     throw new ApiError(400, "videoId is missing");
+  }
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(400, "videoId is not valid");
   }
 
   const comments = await Comment.find({ video: videoId })
@@ -27,7 +30,9 @@ const addComment = asyncHandler(async (req, res) => {
   if (!videoId?.trim()) {
     throw new ApiError(400, "videoId is missing");
   }
-
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(400, "videoId is not valid");
+  }
   const { content } = req.body;
   if (!content) {
     throw new ApiError(400, "All field are required!");
@@ -57,6 +62,9 @@ const updateComment = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
   if (!commentId?.trim()) {
     throw new ApiError(400, "commentId is missing");
+  }
+  if (!isValidObjectId(commentId)) {
+    throw new ApiError(400, "commentId is not valid");
   }
 
   const { content } = req.body;
@@ -89,6 +97,9 @@ const deleteComment = asyncHandler(async (req, res) => {
   if (!commentId?.trim()) {
     throw new ApiError(400, "commentId is missing");
   }
+  if (!isValidObjectId(commentId)) {
+    throw new ApiError(400, "commentId is not valid");
+  }
   const deletedComment = await Comment.findByIdAndDelete(commentId);
 
   if (!deletedComment) {
@@ -97,7 +108,7 @@ const deleteComment = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(new ApiResponse(201, deletedComment, "Comment Deleted Successfully"));
+    .json(new ApiResponse(201, {}, "Comment Deleted Successfully"));
 });
 
 export { getVideoComments, addComment, updateComment, deleteComment };

@@ -9,7 +9,7 @@ import {
 } from "../controllers/video.controller.js"
 import {verifyJWT} from "../middlewares/auth.middleware.js"
 import {upload} from "../middlewares/multer.middleware.js"
-import { verifyIsOwner } from '../middlewares/authVideo.middleware.js';
+import {verifyIsOwnerForVideo} from "../middlewares/verifyOwner.middleware.js"
 
 const router = Router();
 router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
@@ -35,9 +35,9 @@ router
 router
     .route("/:videoId")
     .get(getVideoById)
-    .delete(verifyIsOwner,deleteVideo)
-    .patch(upload.single("thumbnail"),verifyIsOwner, updateVideo);
+    .delete(verifyIsOwnerForVideo,deleteVideo)
+    .patch(upload.single("thumbnail"),verifyIsOwnerForVideo, updateVideo);
 
-router.route("/toggle/publish/:videoId").patch(verifyIsOwner,togglePublishStatus);
+router.route("/toggle/publish/:videoId").patch(verifyIsOwnerForVideo,togglePublishStatus);
 
 export default router
