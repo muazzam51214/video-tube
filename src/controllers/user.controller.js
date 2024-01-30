@@ -8,8 +8,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { extractPublicId } from 'cloudinary-build-url'
-
+import { extractPublicId } from "cloudinary-build-url";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -264,7 +263,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   if (!oldAvatarURL) {
     new ApiError(400, "Old Avatar not found");
   }
-  const apid = extractPublicId(oldAvatarURL)
+  const apid = extractPublicId(oldAvatarURL);
 
   const oldAvatar = await deleteFromCloudinary(apid);
   if (!oldAvatar) {
@@ -413,26 +412,27 @@ const getWatchHistory = asyncHandler(async (req, res) => {
             },
           },
           {
-            $addFields : {
-              owner : {
-                $first : "$owner"
-              }
-            }
-          }
+            $addFields: {
+              owner: {
+                $first: "$owner",
+              },
+            },
+          },
         ],
       },
     },
   ]);
 
-  return res.status(200)
-  .json(new ApiResponse(200, user[0].watchHistory, "Watch History Fetched Successfully"))
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        user[0].watchHistory,
+        "Watch History Fetched Successfully"
+      )
+    );
 });
-
-
-
-
-
-
 
 export {
   registerUser,

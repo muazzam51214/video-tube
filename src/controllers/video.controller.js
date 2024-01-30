@@ -103,7 +103,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
 const getVideoById = asyncHandler(async (req, res) => {
   //TODO: get video by id
   const { videoId } = req.params;
-  
+
   if (!videoId?.trim()) {
     throw new ApiError(400, "videoId is missing");
   }

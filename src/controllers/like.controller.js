@@ -17,30 +17,28 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
   const existingLike = await Like.findOne({
     video: videoId,
     likedBy: req.user?._id,
-  })
-
-  if(existingLike){
-    await Like.findByIdAndDelete(existingLike._id);
-    return res
-    .status(201)
-    .json(new ApiResponse(200, {}, "Like removed from Video successfully!"));
-
-  }else{
-
-  const like = await Like.create({
-    video: videoId,
-    likedBy: req.user?._id,
   });
 
-  const likedVideo = await Like.findById(like._id);
+  if (existingLike) {
+    await Like.findByIdAndDelete(existingLike._id);
+    return res
+      .status(201)
+      .json(new ApiResponse(200, {}, "Like removed from Video successfully!"));
+  } else {
+    const like = await Like.create({
+      video: videoId,
+      likedBy: req.user?._id,
+    });
 
-  if (!likedVideo) {
-    throw new ApiError(500, "Something went wrong while liking video");
-  }
+    const likedVideo = await Like.findById(like._id);
 
-  return res
-    .status(201)
-    .json(new ApiResponse(200, likedVideo, "Video Liked Successfully!"));
+    if (!likedVideo) {
+      throw new ApiError(500, "Something went wrong while liking video");
+    }
+
+    return res
+      .status(201)
+      .json(new ApiResponse(200, likedVideo, "Video Liked Successfully!"));
   }
 });
 
@@ -57,34 +55,32 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
   const existingLike = await Like.findOne({
     comment: commentId,
     likedBy: req.user?._id,
-  })
-
-  if(existingLike){
-    await Like.findByIdAndDelete(existingLike._id);
-    return res
-    .status(201)
-    .json(new ApiResponse(200, {}, "Like removed from comment successfully!"));
-
-  }else{
-
-  const like = await Like.create({
-    comment: commentId,
-    likedBy: req.user?._id,
   });
 
-  const likedComment = await Like.findById(like._id);
+  if (existingLike) {
+    await Like.findByIdAndDelete(existingLike._id);
+    return res
+      .status(201)
+      .json(
+        new ApiResponse(200, {}, "Like removed from comment successfully!")
+      );
+  } else {
+    const like = await Like.create({
+      comment: commentId,
+      likedBy: req.user?._id,
+    });
 
-  if (!likedComment) {
-    throw new ApiError(500, "Something went wrong while liking comment");
-  }
+    const likedComment = await Like.findById(like._id);
 
-  return res
-    .status(201)
-    .json(new ApiResponse(200, likedComment, "Comment Liked Successfully!"));
+    if (!likedComment) {
+      throw new ApiError(500, "Something went wrong while liking comment");
+    }
+
+    return res
+      .status(201)
+      .json(new ApiResponse(200, likedComment, "Comment Liked Successfully!"));
   }
 });
-
-
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
   const { tweetId } = req.params;
@@ -99,33 +95,30 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
   const existingLike = await Like.findOne({
     tweet: tweetId,
     likedBy: req.user?._id,
-  })
-
-  if(existingLike){
-    await Like.findByIdAndDelete(existingLike._id);
-    return res
-    .status(201)
-    .json(new ApiResponse(200, {}, "Like removed from tweet successfully!"));
-
-  }else{
-
-  const like = await Like.create({
-    tweet: tweetId,
-    likedBy: req.user?._id,
   });
 
-  const likedTweet = await Like.findById(like._id);
+  if (existingLike) {
+    await Like.findByIdAndDelete(existingLike._id);
+    return res
+      .status(201)
+      .json(new ApiResponse(200, {}, "Like removed from tweet successfully!"));
+  } else {
+    const like = await Like.create({
+      tweet: tweetId,
+      likedBy: req.user?._id,
+    });
 
-  if (!likedTweet) {
-    throw new ApiError(500, "Something went wrong while liking Tweet");
-  }
+    const likedTweet = await Like.findById(like._id);
 
-  return res
-    .status(201)
-    .json(new ApiResponse(200, likedTweet, "Tweet Liked Successfully!"));
+    if (!likedTweet) {
+      throw new ApiError(500, "Something went wrong while liking Tweet");
+    }
+
+    return res
+      .status(201)
+      .json(new ApiResponse(200, likedTweet, "Tweet Liked Successfully!"));
   }
 });
-
 
 const getLikedVideos = asyncHandler(async (req, res) => {
   const likedVideos = await Like.aggregate([
@@ -134,7 +127,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
         likedBy: new mongoose.Types.ObjectId(req.user._id),
       },
     },
-    
+
     {
       $lookup: {
         from: "videos",
@@ -143,11 +136,11 @@ const getLikedVideos = asyncHandler(async (req, res) => {
         as: "videos",
       },
     },
-    
+
     {
       $unwind: "$videos",
     },
-    
+
     {
       $lookup: {
         from: "likes",
@@ -164,7 +157,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
       },
     },
     {
-      $project : {
+      $project: {
         _id: "$videos._id",
         title: "$videos.title",
         description: "$videos.description",
@@ -173,13 +166,16 @@ const getLikedVideos = asyncHandler(async (req, res) => {
         duration: "$videos.duration",
         views: "$videos.views",
         owner: "$videos.owner",
-        likesCount : "$likesCount"
-      }
-    }
+        likesCount: "$likesCount",
+      },
+    },
   ]);
 
-  return res.status(200)
-  .json(new ApiResponse(200, likedVideos, "Liked Videos Fetched Successfully"))
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, likedVideos, "Liked Videos Fetched Successfully")
+    );
 });
 
 export { toggleCommentLike, toggleTweetLike, toggleVideoLike, getLikedVideos };

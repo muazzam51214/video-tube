@@ -63,7 +63,7 @@ const updateComment = asyncHandler(async (req, res) => {
   if (!content) {
     throw new ApiError(400, "All field are required!");
   }
-  Comment.findOneAndUpdate({_id : commentId},{})
+  Comment.findOneAndUpdate({ _id: commentId }, {});
   const updatedComment = await Comment.findByIdAndUpdate(
     commentId,
     {
@@ -80,9 +80,7 @@ const updateComment = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(
-      new ApiResponse(201, updatedComment, "Comment Updated Successfully")
-    );
+    .json(new ApiResponse(201, updatedComment, "Comment Updated Successfully"));
 });
 
 const deleteComment = asyncHandler(async (req, res) => {
@@ -99,10 +97,7 @@ const deleteComment = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(
-      new ApiResponse(201, deletedComment, "Comment Deleted Successfully")
-    );
-
+    .json(new ApiResponse(201, deletedComment, "Comment Deleted Successfully"));
 });
 
 export { getVideoComments, addComment, updateComment, deleteComment };
