@@ -115,6 +115,18 @@ const getVideoById = asyncHandler(async (req, res) => {
   if (!video) {
     throw new ApiError(404, "Video Not Found");
   }
+
+  // Increment the views count
+  video.views += 1;
+  const view = await video.save({validateBeforeSave: false});
+  if (!view) {
+    throw new ApiError(
+      400,
+      "Something went wrong while increasing view"
+    );
+  }
+
+
   return res
     .status(200)
     .json(new ApiResponse(200, video, "Video Fetched By ID Successfully"));
