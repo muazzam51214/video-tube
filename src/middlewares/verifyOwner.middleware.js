@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { Video } from "../models/video.model.js";
 import { Tweet } from "../models/tweet.model.js";
 import { Comment } from "../models/comment.model.js";
+import { Playlist } from "../models/playlist.model.js";
 
 const verifyIsOwnerForVideo = asyncHandler(async (req, res, next) => {
   try {
@@ -70,4 +71,26 @@ const verifyIsOwnerForComment = asyncHandler(async (req, res, next) => {
   }
 });
 
-export { verifyIsOwnerForVideo, verifyIsOwnerForTweet, verifyIsOwnerForComment };
+const verifyIsOwnerForPlaylist = asyncHandler(async (req, res, next) => {
+  try {
+    const { playlistId } = req.params;
+
+    if (!playlistId) {
+      throw new ApiError(401, "Playlist ID Not Found");
+    }
+
+    const playlist = await Playlist.findById(playlistId);
+    if (!playlist) {
+      throw new ApiError(401, "Playlist Not Found");
+    }
+
+    if (playlist.owner.toString() !== req.user._id.toString()) {
+      throw new ApiError(401, "You are not the owner of this.");
+    }
+    next();
+  } catch (error) {
+    throw new ApiError(401, error?.message || "Playlist Not Found");
+  }
+});
+
+export { verifyIsOwnerForVideo, verifyIsOwnerForTweet, verifyIsOwnerForComment, verifyIsOwnerForPlaylist };
